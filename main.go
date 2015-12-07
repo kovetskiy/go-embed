@@ -141,11 +141,23 @@ func contentType(filename string) string {
 	if strings.HasSuffix(filename, ".png") {
 		return "image/png"
 	}
+	if strings.HasSuffix(filename, ".svg") {
+		return "image/png"
+	}
 	if strings.HasSuffix(filename, ".css") {
 		return "text/css"
 	}
 	if strings.HasSuffix(filename, ".js") {
 		return "application/js"
+	}
+	if strings.HasSuffix(filename, ".eot") {
+		return "font/eot"
+	}
+	if strings.HasSuffix(filename, ".ttf") {
+		return "font/ttf"
+	}
+	if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
+		return "application/font-woff"
 	}
 	return "text/html"
 }
@@ -208,11 +220,23 @@ func contentType(filename string) string {
   if strings.HasSuffix(filename, ".png") {
     return "image/png"
   }
+  if strings.HasSuffix(filename, ".svg") {
+    return "image/png"
+  }
   if strings.HasSuffix(filename, ".css") {
     return "text/css"
   }
   if strings.HasSuffix(filename, ".js") {
     return "application/js"
+  }
+  if strings.HasSuffix(filename, ".eot") {
+    return "font/eot"
+  }
+  if strings.HasSuffix(filename, ".ttf") {
+    return "font/ttf"
+  }
+  if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
+    return "application/font-woff"
   }
   return "text/html"
 }
@@ -226,6 +250,7 @@ func Asset(path string, debug bool) ([]byte, string, string) {
     var err error
     var b bytes.Buffer
     var file string
+    path = strings.Replace(path, "?v=4.4.0", "", -1)
     if path == "/" {
       file = "%s" + "index.html"
       data, err = ioutil.ReadFile(file)
@@ -251,8 +276,12 @@ func Asset(path string, debug bool) ([]byte, string, string) {
     return data, hex.EncodeToString(sum[1:len(sum)-1]), contentType(file)
   } else {
     switch path {
-`, *In, *In); err != nil {
+`, *In, strings.TrimSuffix(*In, "/"), *In); err != nil {
 		panic(err)
+	}
+	indexFile := `[]byte{}`
+	if _, ok := files["index.html"]; ok {
+		indexFile = "IndexFile"
 	}
 	for path, hash := range files {
 		if _, err = fmt.Fprintf(bfd, `    case "%s":
@@ -262,11 +291,11 @@ func Asset(path string, debug bool) ([]byte, string, string) {
 		}
 	}
 	if _, err = fmt.Fprintf(bfd, `    default:
-      return IndexHtml, "%s", "text/html"
+      return %s, "%s", "text/html"
     }
   }
 }
-`, randStr()); err != nil {
+`, indexFile, randStr()); err != nil {
 		panic(err)
 	}
 }
