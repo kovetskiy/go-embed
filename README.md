@@ -29,18 +29,21 @@ This is similar to [rust-embed](https://github.com/pyros2097/rust-embed).
 ```
 go get github.com/pyros2097/go-embed
 ```
+## Requirements
+* An `index.html` file in your input folder
 
 ## Documentation
 You can directly access your files as constants from the assets package or
-you can use this func to serve all files stored in your assets folder which might be useful for webservers and has gzip compression and caching inbuilt. Just see the example as to how same caching and compression works in
+you can use this func to serve all files stored in your assets folder which is useful for webservers and has gzip compression and caching inbuilt. Just see the example as to how same caching and compression works in
 production and development.
 ```go
 assets.IndexHtml // direct access
 assets.Asset(path, debug) (data, hash, contentType) // where debug is bool
-// By default for the path '/' or any paht not found in the map it will send the data for 'index.html'
-// This is how there will be no file not found errors and will redirect all paths/routes not found to index.html or '/' route.
-// Its upto your frontend router to figure out whether the route exists or not 
 ```
+The Asset func does not return an error like the rest of the resource embedding tools and thats because in normal SPA applications if a route is not found then you automatically redirect it to the root path.
+Here in go-embed if a file or path is not found then we directly send the 
+data for "index.html" which MUST be present in your input folder.
+And the root path will always return the data for "index.html"
 
 ## Examples
 A simple http server which serves its resources directly.
