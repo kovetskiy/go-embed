@@ -26,8 +26,9 @@ var (
 	Out = flag.String("output", "", "The output filename")
 	Tag = flag.String("tag", "", "The tag to use for the generated package")
 
-	files     = map[string]string{}
-	filesType = map[string]string{}
+	files       = map[string]string{}
+	filesType   = map[string]string{}
+	regFuncName = regexp.MustCompile(`[^a-zA-Z0-9_]`)
 )
 
 type ByteWriter struct {
@@ -60,12 +61,6 @@ func (w *ByteWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-var regFuncName = regexp.MustCompile(`[^a-zA-Z0-9_]`)
-
-// safeFunctionName converts the given name into a name
-// which qualifies as a valid function identifier. It
-// also compares against a known list of functions to
-// prevent conflict based on name translation.
 func safeFunctionName(name string) string {
 	var inBytes, outBytes []byte
 	var toUpper bool
@@ -159,7 +154,10 @@ func contentType(filename string) string {
 	if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
 		return "application/font-woff"
 	}
-	return "text/html"
+	if strings.HasSuffix(filename, ".html") {
+		return "text/html"
+	}
+	return ""
 }
 
 func randStr() string {
@@ -238,7 +236,10 @@ func contentType(filename string) string {
   if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
     return "application/font-woff"
   }
-  return "text/html"
+  if strings.HasSuffix(filename, ".html") {
+    return "text/html"
+  }
+  return ""
 }
 
 // Gets the Asset from the file system if debug
@@ -250,7 +251,6 @@ func Asset(path string, debug bool) ([]byte, string, string) {
     var err error
     var b bytes.Buffer
     var file string
-    path = strings.Replace(path, "?v=4.4.0", "", -1)
     if path == "/" {
       file = "%s" + "index.html"
       data, err = ioutil.ReadFile(file)
