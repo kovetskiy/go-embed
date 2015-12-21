@@ -830,18 +830,34 @@ func contentType(filename string) string {
   if strings.HasSuffix(filename, ".png") {
     return "image/png"
   }
+  if strings.HasSuffix(filename, ".svg") {
+    return "image/png"
+  }
   if strings.HasSuffix(filename, ".css") {
     return "text/css"
   }
   if strings.HasSuffix(filename, ".js") {
     return "application/js"
   }
-  return "text/html"
+  if strings.HasSuffix(filename, ".eot") {
+    return "font/eot"
+  }
+  if strings.HasSuffix(filename, ".ttf") {
+    return "font/ttf"
+  }
+  if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
+    return "application/font-woff"
+  }
+  if strings.HasSuffix(filename, ".html") {
+    return "text/html"
+  }
+  return ""
 }
 
 // Gets the Asset from the file system if debug
 // otherwise gets it from the stored data
-// returns the data and the md5 hash of its content
+// returns the data and the md5 hash of its content and its
+// content type
 func Asset(path string, debug bool) ([]byte, string, string) {
   if debug {
     var data []byte
@@ -852,11 +868,11 @@ func Asset(path string, debug bool) ([]byte, string, string) {
       file = "public/" + "index.html"
       data, err = ioutil.ReadFile(file)
     } else {
-      file  = "public/" + path
+      file  = "public" + path
       data, err = ioutil.ReadFile(file)
     }
     if err != nil {
-      file = "%!s(MISSING)" + "index.html"
+      file = "public/" + "index.html"
       data, err = ioutil.ReadFile(file)
     }
     if err != nil {
@@ -869,12 +885,11 @@ func Asset(path string, debug bool) ([]byte, string, string) {
       data = b.Bytes()
     }
     sum := md5.Sum(data)
-    sum = md5.Sum(nil)
-    return data, hex.EncodeToString(sum[1:len(sum)-1]), contentType(file)
+    return data, hex.EncodeToString(sum[1:len(sum)]), contentType(file)
   } else {
     switch path {
     case "/images/doc.txt":
-      return ImagesDocTxt, "46e4cbabad5bf5878929b3d2af3e152b", "text/html"
+      return ImagesDocTxt, "46e4cbabad5bf5878929b3d2af3e152b", ""
     case "/images/llama.png":
       return ImagesLlamaPng, "40ff5196e0adae558c0bf8d7f1afa7a6", "image/png"
     case "/index.html":
@@ -884,7 +899,7 @@ func Asset(path string, debug bool) ([]byte, string, string) {
     case "/main.js":
       return MainJs, "a04c8a560bae5b7cfb6747f7bf7b81fa", "application/js"
     default:
-      return IndexHtml, "53e2be2b9a962f04b102b8be04b356cead", "text/html"
+      return IndexHtml, "4d93bdfee9e4788d1be4a78b9169c15b5d", "text/html"
     }
   }
 }

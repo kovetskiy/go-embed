@@ -244,7 +244,8 @@ func contentType(filename string) string {
 
 // Gets the Asset from the file system if debug
 // otherwise gets it from the stored data
-// returns the data and the md5 hash of its content
+// returns the data and the md5 hash of its content and its
+// content type
 func Asset(path string, debug bool) ([]byte, string, string) {
   if debug {
     var data []byte
@@ -272,16 +273,15 @@ func Asset(path string, debug bool) ([]byte, string, string) {
       data = b.Bytes()
     }
     sum := md5.Sum(data)
-    sum = md5.Sum(nil)
-    return data, hex.EncodeToString(sum[1:len(sum)-1]), contentType(file)
+    return data, hex.EncodeToString(sum[1:len(sum)]), contentType(file)
   } else {
     switch path {
 `, *In, strings.TrimSuffix(*In, "/"), *In); err != nil {
 		panic(err)
 	}
 	indexFile := `[]byte{}`
-	if _, ok := files["index.html"]; ok {
-		indexFile = "IndexFile"
+	if _, ok := files["/index.html"]; ok {
+		indexFile = "IndexHtml"
 	}
 	for path, hash := range files {
 		if _, err = fmt.Fprintf(bfd, `    case "%s":

@@ -40,7 +40,7 @@ production and development.
 assets.IndexHtml // direct access
 assets.Asset(path, debug) (data, hash, contentType) // where debug is bool
 ```
-The Asset func does not return an error like the rest of the resource embedding tools and thats because in normal SPA applications if a route is not found then you automatically redirect it to the root path.
+The Asset func does not return an error like the rest of the resource embedding tools and that's because in normal SPA applications if a route is not found then you automatically redirect it to the root path.
 Here in go-embed if a file or path is not found then we directly send the 
 data for "index.html" which MUST be present in your input folder.
 And the root path will always return the data for "index.html"
@@ -62,8 +62,8 @@ import (
 
 func main() {
   http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-    println("GET " + req.URL.String())
-    data, hash, contentType := assets.Asset(req.URL.String(), false)
+    println("GET " + req.URL.Path)
+    data, hash, contentType := assets.Asset(req.URL.Path, false)
     res.Header().Set("Content-Encoding", "gzip")
     res.Header().Set("Content-Type", contentType)
     res.Header().Add("Cache-Control", "public, max-age=31536000")

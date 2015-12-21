@@ -8,8 +8,8 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
-		println("GET " + req.URL.String())
-		data, hash, contentType := assets.Asset(req.URL.String(), false)
+		println("GET " + req.URL.Path)
+		data, hash, contentType := assets.Asset(req.URL.Path, false)
 		res.Header().Set("Content-Encoding", "gzip")
 		res.Header().Set("Content-Type", contentType)
 		res.Header().Add("Cache-Control", "public, max-age=31536000")
