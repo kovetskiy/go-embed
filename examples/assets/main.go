@@ -3,14 +3,14 @@
 package assets
 
 import (
-  "bytes"
-  "compress/gzip"
-  "crypto/md5"
-  "encoding/hex"
-  "io/ioutil"
-  "strings"
+    "bytes"
+    "compress/gzip"
+    "crypto/md5"
+    "encoding/hex"
+    "io/ioutil"
+    "strings"
 )
-
+	
 var ImagesDocTxt = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x0a, 0x49,
 	0x2d, 0x2e, 0xc9, 0xcc, 0x4b, 0x57, 0x30, 0x54, 0x30, 0x52, 0x30, 0xe6,
@@ -827,79 +827,76 @@ var MainJs = []byte{
 
 // returns the contentType for the file
 func contentType(filename string) string {
-  if strings.HasSuffix(filename, ".png") {
-    return "image/png"
-  }
-  if strings.HasSuffix(filename, ".svg") {
-    return "image/png"
-  }
-  if strings.HasSuffix(filename, ".css") {
-    return "text/css"
-  }
-  if strings.HasSuffix(filename, ".js") {
-    return "application/js"
-  }
-  if strings.HasSuffix(filename, ".eot") {
-    return "font/eot"
-  }
-  if strings.HasSuffix(filename, ".ttf") {
-    return "font/ttf"
-  }
-  if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
-    return "application/font-woff"
-  }
-  if strings.HasSuffix(filename, ".html") {
-    return "text/html"
-  }
-  return ""
+    if strings.HasSuffix(filename, ".png") {
+    	return "image/png"
+    }
+    if strings.HasSuffix(filename, ".svg") {
+    	return "image/png"
+    }
+    if strings.HasSuffix(filename, ".css") {
+    	return "text/css"
+    }
+    if strings.HasSuffix(filename, ".js") {
+      	return "application/js"
+    }
+    if strings.HasSuffix(filename, ".eot") {
+      	return "font/eot"
+    }
+    if strings.HasSuffix(filename, ".ttf") {
+      	return "font/ttf"
+    }
+    if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
+      	return "application/font-woff"
+    }
+    if strings.HasSuffix(filename, ".html") {
+      	return "text/html"
+    }
+    return ""
 }
 
-// Gets the Asset from the file system if debug
-// otherwise gets it from the stored data
-// returns the data and the md5 hash of its content and its
-// content type
+// Asset Gets the file from system if debug otherwise gets it from the stored
+// data returns the data, the md5 hash of its content and its content type
 func Asset(path string, debug bool) ([]byte, string, string) {
-  if debug {
-    var data []byte
-    var err error
-    var b bytes.Buffer
-    var file string
-    if path == "/" {
-      file = "public/" + "index.html"
-      data, err = ioutil.ReadFile(file)
-    } else {
-      file  = "public" + path
-      data, err = ioutil.ReadFile(file)
+    if debug {
+    	var data []byte
+      	var err error
+      	var b bytes.Buffer
+      	var file string
+      	if path == "/" {
+        	file = "public/" + "index.html"
+        	data, err = ioutil.ReadFile(file)
+      	} else {
+        	file = "public" + path
+        	data, err = ioutil.ReadFile(file)
+      	}
+      	if err != nil {
+        	file = "public/" + "index.html"
+        	data, err = ioutil.ReadFile(file)
+      	}
+      	if err != nil {
+      		return []byte("File Not Found " + file), "", "text/html"
+      	}
+      	if data != nil {
+        	w := gzip.NewWriter(&b)
+        	w.Write(data)
+        	w.Close()
+        	data = b.Bytes()
+      	}
+      	sum := md5.Sum(data)
+      	return data, hex.EncodeToString(sum[1:len(sum)]), contentType(file)
     }
-    if err != nil {
-      file = "public/" + "index.html"
-      data, err = ioutil.ReadFile(file)
-    }
-    if err != nil {
-      return []byte("File Not Found " + file), "", "text/html"
-    }
-    if data != nil {
-      w := gzip.NewWriter(&b)
-      w.Write(data)
-      w.Close()
-      data = b.Bytes()
-    }
-    sum := md5.Sum(data)
-    return data, hex.EncodeToString(sum[1:len(sum)]), contentType(file)
-  } else {
     switch path {
-    case "/images/doc.txt":
-      return ImagesDocTxt, "46e4cbabad5bf5878929b3d2af3e152b", ""
-    case "/images/llama.png":
-      return ImagesLlamaPng, "40ff5196e0adae558c0bf8d7f1afa7a6", "image/png"
-    case "/index.html":
-      return IndexHtml, "72d36f1496a526d032ff9411eb928e34", "text/html"
-    case "/main.css":
-      return MainCss, "82629585640faf5fc34bf68da2e11ea2", "text/css"
-    case "/main.js":
-      return MainJs, "a04c8a560bae5b7cfb6747f7bf7b81fa", "application/js"
-    default:
-      return IndexHtml, "4d93bdfee9e4788d1be4a78b9169c15b5d", "text/html"
-    }
-  }
+	case "/images/llama.png":
+		return ImagesLlamaPng, "40ff5196e0adae558c0bf8d7f1afa7a6", "image/png"
+	case "/index.html":
+		return IndexHtml, "72d36f1496a526d032ff9411eb928e34", "text/html"
+	case "/main.css":
+		return MainCss, "82629585640faf5fc34bf68da2e11ea2", "text/css"
+	case "/main.js":
+		return MainJs, "a04c8a560bae5b7cfb6747f7bf7b81fa", "application/js"
+	case "/images/doc.txt":
+		return ImagesDocTxt, "46e4cbabad5bf5878929b3d2af3e152b", ""
+	default:
+    	return IndexHtml, "aee00c5df0b9be9f385c9350f4c15b22d1", "text/html"
+	}
 }
