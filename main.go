@@ -62,11 +62,14 @@ func (w *ByteWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-func safeFunctionName(name string) string {
+func safeVarName(name string) string {
 	var inBytes, outBytes []byte
 	var toUpper bool
 	// uppercase the first char to make it public
 	name = strings.Title(name)
+	parts := strings.Split(string(name), ".")
+	parts[len(parts)-1] = strings.ToUpper(parts[len(parts)-1])
+	name = strings.Join(parts, "")
 	inBytes = []byte(name)
 	for i := 0; i < len(inBytes); i++ {
 		if regFuncName.Match([]byte{inBytes[i]}) {
@@ -78,8 +81,7 @@ func safeFunctionName(name string) string {
 			outBytes = append(outBytes, inBytes[i])
 		}
 	}
-	name = string(outBytes)
-	return name
+	return string(outBytes)
 }
 
 // need to pipe read to write
@@ -101,7 +103,8 @@ func recursiveRead(w io.Writer, folder string) {
 				panic(err)
 			}
 			defer fd.Close()
-			_, err = fmt.Fprintf(w, "var %s = []byte{", safeFunctionName(relativePath))
+			varname := safeVarName(relativePath)
+			_, err = fmt.Fprintf(w, "//%s file\nvar %s = []byte{", varname, varname)
 			if err != nil {
 				panic(err)
 			}
@@ -280,12 +283,12 @@ func Asset(path string, debug bool) ([]byte, string, string) {
 	}
 	indexFile := `[]byte{}`
 	if _, ok := files["/index.html"]; ok {
-		indexFile = "IndexHtml"
+		indexFile = "IndexHTML"
 	}
 	for path, hash := range files {
 		if _, err = fmt.Fprintf(bfd, `	case "%s":
 		return %s, "%s", "%s"
-`, path, safeFunctionName(path), hash, filesType[path]); err != nil {
+`, path, safeVarName(path), hash, filesType[path]); err != nil {
 			panic(err)
 		}
 	}
