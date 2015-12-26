@@ -892,7 +892,7 @@ func Asset(path string, debug bool) ([]byte, string, string) {
 			data = b.Bytes()
 		}
 		sum := md5.Sum(data)
-		return data, hex.EncodeToString(sum[1:len(sum)]), contentType(file)
+		return data, hex.EncodeToString(sum[1:]), contentType(file)
 	}
 	switch path {
 	case "/main.js":
