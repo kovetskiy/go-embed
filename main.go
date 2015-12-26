@@ -104,7 +104,7 @@ func recursiveRead(w io.Writer, folder string) {
 			}
 			defer fd.Close()
 			varname := safeVarName(relativePath)
-			_, err = fmt.Fprintf(w, "//%s file\nvar %s = []byte{", varname, varname)
+			_, err = fmt.Fprintf(w, "\n//%s file\nvar %s = []byte{", varname, varname)
 			if err != nil {
 				panic(err)
 			}
@@ -211,7 +211,6 @@ import (
 	"io/ioutil"
 	"strings"
 )
-	
 `); err != nil {
 		panic(err)
 	}
