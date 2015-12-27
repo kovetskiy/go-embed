@@ -37,7 +37,7 @@ You can directly access your files as constants from the assets package or
 you can use this func to serve all files stored in your assets folder which is useful for webservers and has gzip compression and caching inbuilt. Just see the example as to how same caching and compression works in
 production and development.
 ```go
-assets.IndexHtml // direct access
+assets.IndexHTML // direct access
 assets.Asset(path, debug) (data, hash, contentType) // where debug is bool
 ```
 The Asset func does not return an error like the rest of the resource embedding tools and that's because in normal SPA applications if a route is not found then you automatically redirect it to the root path.
