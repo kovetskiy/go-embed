@@ -2,16 +2,7 @@
 
 package assets
 
-import (
-	"bytes"
-	"compress/gzip"
-	"crypto/md5"
-	"encoding/hex"
-	"io/ioutil"
-	"strings"
-)
-
-//ImagesDocTXT file
+// ImagesDocTXT file
 var ImagesDocTXT = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x0a, 0x49,
 	0x2d, 0x2e, 0xc9, 0xcc, 0x4b, 0x57, 0x30, 0x54, 0x30, 0x52, 0x30, 0xe6,
@@ -19,7 +10,7 @@ var ImagesDocTXT = []byte{
 	0x00, 0x00,
 }
 
-//ImagesLlamaPNG file
+// ImagesLlamaPNG file
 var ImagesLlamaPNG = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x00, 0x46,
 	0x23, 0xb9, 0xdc, 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00,
@@ -778,7 +769,7 @@ var ImagesLlamaPNG = []byte{
 	0xff, 0xff, 0xb3, 0xf7, 0x9f, 0x6b, 0x46, 0x23, 0x00, 0x00,
 }
 
-//IndexHTML file
+// IndexHTML file
 var IndexHTML = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x5c, 0x51,
 	0xcd, 0x6e, 0xe3, 0x20, 0x10, 0xbe, 0xe7, 0x29, 0x66, 0xd9, 0x7b, 0x88,
@@ -808,7 +799,7 @@ var IndexHTML = []byte{
 	0x17, 0x02, 0x00, 0x00,
 }
 
-//MainCSS file
+// MainCSS file
 var MainCSS = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x34, 0xcd,
 	0x41, 0x8a, 0xc3, 0x30, 0x0c, 0x85, 0xe1, 0xbd, 0x4e, 0x21, 0x98, 0x75,
@@ -824,7 +815,7 @@ var MainCSS = []byte{
 	0xff, 0xff, 0xe2, 0x4b, 0x2d, 0xfc, 0xa4, 0x00, 0x00, 0x00,
 }
 
-//MainJS file
+// MainJS file
 var MainJS = []byte{
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x4a, 0xce,
 	0xcf, 0x2b, 0xce, 0xcf, 0x49, 0xd5, 0xcb, 0xc9, 0x4f, 0xd7, 0x50, 0x72,
@@ -834,67 +825,12 @@ var MainJS = []byte{
 	0x00, 0x00,
 }
 
-// returns the contentType for the file
-func contentType(filename string) string {
-	if strings.HasSuffix(filename, ".png") {
-		return "image/png"
-	}
-	if strings.HasSuffix(filename, ".svg") {
-		return "image/png"
-	}
-	if strings.HasSuffix(filename, ".css") {
-		return "text/css"
-	}
-	if strings.HasSuffix(filename, ".js") {
-		return "application/js"
-	}
-	if strings.HasSuffix(filename, ".eot") {
-		return "font/eot"
-	}
-	if strings.HasSuffix(filename, ".ttf") {
-		return "font/ttf"
-	}
-	if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
-		return "application/font-woff"
-	}
-	if strings.HasSuffix(filename, ".html") {
-		return "text/html"
-	}
-	return ""
-}
-
-// Asset Gets the file from system if debug otherwise gets it from the stored
-// data returns the data, the md5 hash of its content and its content type
-func Asset(path string, debug bool) ([]byte, string, string) {
-	if debug {
-		var data []byte
-		var err error
-		var b bytes.Buffer
-		var file string
-		if path == "/" {
-			file = "public/" + "index.html"
-			data, err = ioutil.ReadFile(file)
-		} else {
-			file = "public" + path
-			data, err = ioutil.ReadFile(file)
-		}
-		if err != nil {
-			file = "public/" + "index.html"
-			data, err = ioutil.ReadFile(file)
-		}
-		if err != nil {
-			return []byte("File Not Found " + file), "", "text/html"
-		}
-		if data != nil {
-			w := gzip.NewWriter(&b)
-			w.Write(data)
-			w.Close()
-			data = b.Bytes()
-		}
-		sum := md5.Sum(data)
-		return data, hex.EncodeToString(sum[1:]), contentType(file)
-	}
+// Asset Gets the file from from the stored data and returns the data,
+// the md5 hash of its content and its content type
+func Asset(path string) ([]byte, string, string) {
 	switch path {
+	case "/main.css":
+		return MainCSS, "82629585640faf5fc34bf68da2e11ea2", "text/css"
 	case "/main.js":
 		return MainJS, "a04c8a560bae5b7cfb6747f7bf7b81fa", "application/js"
 	case "/images/doc.txt":
@@ -903,9 +839,7 @@ func Asset(path string, debug bool) ([]byte, string, string) {
 		return ImagesLlamaPNG, "40ff5196e0adae558c0bf8d7f1afa7a6", "image/png"
 	case "/index.html":
 		return IndexHTML, "72d36f1496a526d032ff9411eb928e34", "text/html"
-	case "/main.css":
-		return MainCSS, "82629585640faf5fc34bf68da2e11ea2", "text/css"
 	default:
-		return IndexHTML, "c23b51baa2b4e530366894768e38795bef", "text/html"
+		return IndexHTML, "c013afe37aac2393a8bbe893749938c988", "text/html"
 	}
 }

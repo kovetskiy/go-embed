@@ -83,6 +83,84 @@ func main() {
 }
 ```
 
+For development mode you can use this as a template file for running your
+server and loading the assets directly from the filesystem and in release
+this file would be rewritten by the go-embed tool to contain the actual file
+data. This file can be safely committed to your git repository.
+```go
+package assets
+
+import (
+  "bytes"
+  "compress/gzip"
+  "crypto/md5"
+  "encoding/hex"
+  "io/ioutil"
+  "strings"
+)
+
+// returns the contentType for the file
+func contentType(filename string) string {
+  if strings.HasSuffix(filename, ".png") {
+    return "image/png"
+  }
+  if strings.HasSuffix(filename, ".svg") {
+    return "image/png"
+  }
+  if strings.HasSuffix(filename, ".css") {
+    return "text/css"
+  }
+  if strings.HasSuffix(filename, ".js") {
+    return "application/js"
+  }
+  if strings.HasSuffix(filename, ".eot") {
+    return "font/eot"
+  }
+  if strings.HasSuffix(filename, ".ttf") {
+    return "font/ttf"
+  }
+  if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
+    return "application/font-woff"
+  }
+  if strings.HasSuffix(filename, ".html") {
+    return "text/html"
+  }
+  return ""
+}
+
+// Asset Gets the file from system if debug otherwise gets it from the stored
+// data returns the data, the md5 hash of its content and its content type
+func Asset(path string) ([]byte, string, string) {
+  var data []byte
+  var err error
+  var b bytes.Buffer
+  var file string
+  if path == "/" {
+    file = "ui/my-first-ui/src/public/" + "index.html"
+    data, err = ioutil.ReadFile(file)
+  } else {
+    file = "ui/my-first-ui/src/public" + path
+    data, err = ioutil.ReadFile(file)
+  }
+  if err != nil {
+    file = "ui/my-first-ui/src/public/" + "index.html"
+    data, err = ioutil.ReadFile(file)
+  }
+  if err != nil {
+    return []byte("File Not Found " + file), "", "text/html"
+  }
+  if data != nil {
+    w := gzip.NewWriter(&b)
+    w.Write(data)
+    w.Close()
+    data = b.Bytes()
+  }
+  sum := md5.Sum(data)
+  return data, hex.EncodeToString(sum[1:]), contentType(file)
+}
+
+```
+
 Go Gophers!
 
 The power is yours!
