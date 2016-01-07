@@ -86,7 +86,8 @@ func main() {
 For development mode you can use this as a template file for running your
 server and loading the assets directly from the filesystem and in release
 this file would be rewritten by the go-embed tool to contain the actual file
-data. This file can be safely committed to your git repository.
+data and after you run your build command you might need  to checkout this file
+again. This file can be safely committed to your git repository.
 ```go
 package assets
 
