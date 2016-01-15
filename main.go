@@ -206,7 +206,10 @@ func main() {
 	if _, err = fmt.Fprintf(bfd, `
 // Asset Gets the file from from the stored data and returns the data,
 // the md5 hash of its content and its content type
-func Asset(path string) ([]byte, string, string) {
+// in production the base parameter is ignored
+// use it for developement as the relativepath/to/your/public/folder
+// ex: ui/myproject/src/public
+func Asset(base, path string) ([]byte, string, string) {
 	switch path {
 `); err != nil {
 		panic(err)

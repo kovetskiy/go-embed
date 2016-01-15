@@ -48,8 +48,13 @@ And the root path will always return the data for "index.html"
 ## Examples
 A simple http server which serves its resources directly.
 
-To see it in action,
-`go run examples/main.go`
+Navigate to the example folder and run these commands,
+
+To see it in action in development,
+`go run --tags dev main.go`
+
+To see it in action in production,
+`go run --tags prod main.go`
 
 ```go
 package main
@@ -131,20 +136,23 @@ func contentType(filename string) string {
 
 // Asset Gets the file from system if debug otherwise gets it from the stored
 // data returns the data, the md5 hash of its content and its content type
-func Asset(path string) ([]byte, string, string) {
+// in production the base parameter is ignored
+// use it for developement as the relativepath/to/your/public/folder
+// ex: ui/myproject/src/public
+func Asset(base, path string) ([]byte, string, string) {
   var data []byte
   var err error
   var b bytes.Buffer
   var file string
   if path == "/" {
-    file = "ui/my-first-ui/src/public/" + "index.html"
+    file = base + "index.html"
     data, err = ioutil.ReadFile(file)
   } else {
-    file = "ui/my-first-ui/src/public" + path
+    file = base + path
     data, err = ioutil.ReadFile(file)
   }
   if err != nil {
-    file = "ui/my-first-ui/src/public/" + "index.html"
+    file = base + "index.html"
     data, err = ioutil.ReadFile(file)
   }
   if err != nil {
@@ -159,7 +167,6 @@ func Asset(path string) ([]byte, string, string) {
   sum := md5.Sum(data)
   return data, hex.EncodeToString(sum[1:]), contentType(file)
 }
-
 ```
 
 Go Gophers!
