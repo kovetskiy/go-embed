@@ -38,7 +38,7 @@ you can use this func to serve all files stored in your assets folder which is u
 production and development.
 ```go
 assets.IndexHTML // direct access
-assets.Asset(path) (data, hash, contentType)
+assets.Asset(base, path) (data, hash, contentType)
 ```
 The Asset func does not return an error like the rest of the resource embedding tools and that's because in normal SPA applications if a route is not found then you automatically redirect it to the root path.
 Here in go-embed if a file or path is not found then we directly send the 
@@ -68,7 +68,7 @@ import (
 func main() {
   http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
     println("GET " + req.URL.Path)
-    data, hash, contentType := assets.Asset(req.URL.Path)
+    data, hash, contentType := assets.Asset("", req.URL.Path)
     res.Header().Set("Content-Encoding", "gzip")
     res.Header().Set("Content-Type", contentType)
     res.Header().Add("Cache-Control", "public, max-age=31536000")
