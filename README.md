@@ -168,6 +168,13 @@ func Asset(base, path string) ([]byte, string, string) {
   return data, hex.EncodeToString(sum[1:]), contentType(file)
 }
 ```
+This is how I use it in my make file,
+```bash
+cd ui/$(Project) && npm install && npm run build
+go-embed -input ui/$(Project)/src/public -output assets/main.go
+go build -o $(Project) -tags '$(Project)' $(Project).go
+git checkout assets/main.go
+```
 
 Go Gophers!
 
