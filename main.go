@@ -44,16 +44,7 @@ func (w *ByteWriter) Write(p []byte) (n int, err error) {
 		return
 	}
 	for n = range p {
-		if w.c%12 == 0 {
-			w.Writer.Write(newline)
-			w.Writer.Write(dataindent)
-			w.c = 0
-		} else {
-			w.Writer.Write(space)
-		}
-
-		fmt.Fprintf(w.Writer, "0x%02x,", p[n])
-		w.c++
+		fmt.Fprintf(w.Writer, "\\x%02x", p[n])
 	}
 
 	n++
@@ -104,7 +95,7 @@ func recursiveRead(w io.Writer, folder string) {
 			}
 			defer fd.Close()
 			varname := safeVarName(relativePath)
-			_, err = fmt.Fprintf(w, "\n// %s file\nvar %s = []byte{", varname, varname)
+			_, err = fmt.Fprintf(w, "\n// %s file\nvar %s = []byte(\"", varname, varname)
 			if err != nil {
 				panic(err)
 			}
@@ -125,7 +116,7 @@ func recursiveRead(w io.Writer, folder string) {
 			if err != nil {
 				panic(err)
 			}
-			_, err = fmt.Fprintf(w, "\n}\n")
+			_, err = fmt.Fprintf(w, "\")\n")
 			if err != nil {
 				panic(err)
 			}
