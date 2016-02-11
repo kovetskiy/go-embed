@@ -9,7 +9,13 @@ import (
 func main() {
 	http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		println("GET " + req.URL.Path)
-		data, hash, contentType := assets.Asset("public/", req.URL.Path)
+		data, hash, contentType, err := assets.Asset("public/", req.URL.Path)
+		if err != nil {
+			data, hash, contentType, err = assets.Asset("public/", "index.html")
+			if err != nil {
+				data = []byte(err.Error())
+			}
+		}
 		res.Header().Set("Content-Encoding", "gzip")
 		res.Header().Set("Content-Type", contentType)
 		res.Header().Add("Cache-Control", "public, max-age=31536000")
