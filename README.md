@@ -28,8 +28,6 @@ This is similar to [rust-embed](https://github.com/pyros2097/rust-embed).
 ```
 go get github.com/pyros2097/go-embed
 ```
-## Requirements
-* An `index.html` file in your input folder
 
 ## Documentation
 You can directly access your files as constants from the assets package or
@@ -46,10 +44,16 @@ A simple http server which serves its resources directly.
 Navigate to the example folder and run these commands,
 
 To see it in action in development,
-`go run --tags dev main.go`
+`go run main.go`
 
 To see it in action in production,
-`go run --tags prod main.go`
+```
+cd examples
+go-embed -input public/ -output assets/main.go
+go run main.go
+git stash
+git stash drop
+```
 
 ```go
 package main
@@ -63,9 +67,12 @@ import (
 func main() {
   http.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
     println("GET " + req.URL.Path)
-    data, hash, contentType, err := assets.Asset("", req.URL.Path)
+    data, hash, contentType, err := assets.Asset("public/", req.URL.Path)
     if err != nil {
-      // use next middleware
+      data, hash, contentType, err = assets.Asset("public", "/index.html")
+      if err != nil {
+        data = []byte(err.Error())
+      }
     }
     res.Header().Set("Content-Encoding", "gzip")
     res.Header().Set("Content-Type", contentType)
