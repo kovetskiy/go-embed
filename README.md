@@ -11,7 +11,6 @@ Generates go code to embed resource files into your library or executable
   Usage:
     -input  string  The path to the folder containing the assets
     -output string  The output filename
-    -tag    string  The tag to use for the generated package
 
   example:
     go-embed -input public/ -output assets/main.go

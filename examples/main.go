@@ -11,7 +11,7 @@ func main() {
 		println("GET " + req.URL.Path)
 		data, hash, contentType, err := assets.Asset("public/", req.URL.Path)
 		if err != nil {
-			data, hash, contentType, err = assets.Asset("public/", "index.html")
+			data, hash, contentType, err = assets.Asset("public", "/index.html")
 			if err != nil {
 				data = []byte(err.Error())
 			}
