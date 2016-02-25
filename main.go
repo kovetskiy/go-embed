@@ -11,8 +11,10 @@ import (
 	"hash"
 	"io"
 	"io/ioutil"
+	"mime"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -120,38 +122,9 @@ func recursiveRead(w io.Writer, folder string) {
 				panic(err)
 			}
 			files[relativePath] = hex.EncodeToString(byteWriter.digest.Sum(nil))
-			filesType[relativePath] = contentType(relativePath)
+			filesType[relativePath] = mime.TypeByExtension(filepath.Ext(relativePath))
 		}
 	}
-}
-
-// returns the contentType for the file
-func contentType(filename string) string {
-	if strings.HasSuffix(filename, ".png") {
-		return "image/png"
-	}
-	if strings.HasSuffix(filename, ".svg") {
-		return "image/png"
-	}
-	if strings.HasSuffix(filename, ".css") {
-		return "text/css"
-	}
-	if strings.HasSuffix(filename, ".js") {
-		return "application/js"
-	}
-	if strings.HasSuffix(filename, ".eot") {
-		return "font/eot"
-	}
-	if strings.HasSuffix(filename, ".ttf") {
-		return "font/ttf"
-	}
-	if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
-		return "application/font-woff"
-	}
-	if strings.HasSuffix(filename, ".html") {
-		return "text/html"
-	}
-	return ""
 }
 
 func randStr() string {
@@ -165,6 +138,12 @@ func randStr() string {
 }
 
 func main() {
+	mime.AddExtensionType(".ico", "image/x-icon")
+	mime.AddExtensionType(".eot", "font/eot")
+	mime.AddExtensionType(".tff", "font/tff")
+	mime.AddExtensionType(".woff", "application/font-woff")
+	mime.AddExtensionType(".woff2", "application/font-woff")
+	println(fmt.Sprintf("go-embed 1.1.0"))
 	flag.Parse()
 	if *input == "" {
 		flag.PrintDefaults()
