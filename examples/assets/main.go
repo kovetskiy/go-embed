@@ -6,38 +6,16 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"io/ioutil"
-	"strings"
+	"mime"
+	"path/filepath"
 )
 
-func contentType(filename string) string {
-	if strings.HasSuffix(filename, ".png") {
-		return "image/png"
-	}
-	if strings.HasSuffix(filename, ".svg") {
-		return "image/svg"
-	}
-	if strings.HasSuffix(filename, ".jpg") {
-		return "image/jpg"
-	}
-	if strings.HasSuffix(filename, ".css") {
-		return "text/css"
-	}
-	if strings.HasSuffix(filename, ".js") {
-		return "application/js"
-	}
-	if strings.HasSuffix(filename, ".eot") {
-		return "font/eot"
-	}
-	if strings.HasSuffix(filename, ".ttf") {
-		return "font/ttf"
-	}
-	if strings.HasSuffix(filename, ".woff") || strings.HasSuffix(filename, ".woff2") {
-		return "application/font-woff"
-	}
-	if strings.HasSuffix(filename, ".html") {
-		return "text/html"
-	}
-	return ""
+func init() {
+	mime.AddExtensionType(".ico", "image/x-icon")
+	mime.AddExtensionType(".eot", "font/eot")
+	mime.AddExtensionType(".tff", "font/tff")
+	mime.AddExtensionType(".woff", "application/font-woff")
+	mime.AddExtensionType(".woff2", "application/font-woff")
 }
 
 // Asset Gets the file from system if debug otherwise gets it from the stored
@@ -60,5 +38,5 @@ func Asset(base, path string) ([]byte, string, string, error) {
 		data = b.Bytes()
 	}
 	sum := md5.Sum(data)
-	return data, hex.EncodeToString(sum[1:]), contentType(file), nil
+	return data, hex.EncodeToString(sum[1:]), mime.TypeByExtension(filepath.Ext(file)), nil
 }
