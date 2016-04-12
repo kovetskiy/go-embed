@@ -143,7 +143,7 @@ func main() {
 	mime.AddExtensionType(".tff", "font/tff")
 	mime.AddExtensionType(".woff", "application/font-woff")
 	mime.AddExtensionType(".woff2", "application/font-woff")
-	println(fmt.Sprintf("go-embed 1.1.0"))
+	println(fmt.Sprintf("go-embed 1.1.1"))
 	flag.Parse()
 	if *input == "" {
 		flag.PrintDefaults()
