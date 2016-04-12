@@ -58,7 +58,7 @@ func safeVarName(name string) string {
 	var inBytes, outBytes []byte
 	var toUpper bool
 	// uppercase the first char to make it public
-	name = strings.Title(name)
+	name = "_" + strings.Title(name)
 	parts := strings.Split(string(name), ".")
 	parts[len(parts)-1] = strings.ToUpper(parts[len(parts)-1])
 	name = strings.Join(parts, "")
