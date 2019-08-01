@@ -54,11 +54,15 @@ func (w *ByteWriter) Write(p []byte) (n int, err error) {
 	return
 }
 
-func safeVarName(name string) string {
+func safeVarName(name string, prefix bool) string {
 	var inBytes, outBytes []byte
 	var toUpper bool
 	// uppercase the first char to make it public
-	name = "_" + strings.Title(name)
+	name = strings.Title(name)
+	if prefix {
+		name = "_" + name
+	}
+
 	parts := strings.Split(string(name), ".")
 	parts[len(parts)-1] = strings.ToUpper(parts[len(parts)-1])
 	name = strings.Join(parts, "")
@@ -95,7 +99,7 @@ func recursiveRead(w io.Writer, folder string) {
 				panic(err)
 			}
 			defer fd.Close()
-			varname := safeVarName(relativePath)
+			varname := safeVarName(relativePath, true)
 			_, err = fmt.Fprintf(w, "\n// %s file\nvar %s = []byte(\"", varname, varname)
 			if err != nil {
 				panic(err)
@@ -188,7 +192,7 @@ func Asset(base, path string) ([]byte, string, string, error) {
 	for path, hash := range files {
 		if _, err = fmt.Fprintf(bfd, `	case "%s":
 		return %s, "%s", "%s", nil
-`, path, safeVarName(path), hash, filesType[path]); err != nil {
+`, path, safeVarName(path, true), hash, filesType[path]); err != nil {
 			panic(err)
 		}
 	}
@@ -198,5 +202,20 @@ func Asset(base, path string) ([]byte, string, string, error) {
 }
 `); err != nil {
 		panic(err)
+	}
+
+	for path, _ := range files {
+		if _, err = fmt.Fprintf(bfd, `
+// Get%s gets the file %s from the stored data and returns the data.
+func Get%s() []byte {
+	return %s;
+}
+`,
+			safeVarName(path, false),
+			path,
+			safeVarName(path, false),
+			safeVarName(path, true)); err != nil {
+			panic(err)
+		}
 	}
 }
