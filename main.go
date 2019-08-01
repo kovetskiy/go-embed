@@ -24,8 +24,9 @@ var (
 	dataindent = []byte{'\t'}
 	space      = []byte{' '}
 
-	input  = flag.String("input", "", "The path to the folder containing the assets")
-	output = flag.String("output", "", "The output filename")
+	input    = flag.String("input", "", "The path to the folder containing the assets")
+	output   = flag.String("output", "", "The output filename")
+	compress = flag.Bool("compress", true, "Compress input assets with gzip")
 
 	files       = map[string]string{}
 	filesType   = map[string]string{}
@@ -109,17 +110,24 @@ func recursiveRead(w io.Writer, folder string) {
 				digest: md5.New(),
 				hashed: []byte{},
 			}
-			gz, err := gzip.NewWriterLevel(byteWriter, gzip.BestCompression)
-			if err != nil {
-				panic(err)
-			}
-			_, err = io.Copy(gz, fd)
-			if err != nil {
-				panic(err)
-			}
-			err = gz.Close()
-			if err != nil {
-				panic(err)
+			if *compress {
+				gz, err := gzip.NewWriterLevel(byteWriter, gzip.BestCompression)
+				if err != nil {
+					panic(err)
+				}
+				_, err = io.Copy(gz, fd)
+				if err != nil {
+					panic(err)
+				}
+				err = gz.Close()
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				_, err = io.Copy(byteWriter, fd)
+				if err != nil {
+					panic(err)
+				}
 			}
 			_, err = fmt.Fprintf(w, "\")\n")
 			if err != nil {
